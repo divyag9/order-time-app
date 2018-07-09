@@ -31,6 +31,12 @@ def send_message(cell_phone_number, message):
     	from_="+15862571827",
     	body=message)
 
+def get_order_information(order_number):
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * from ORDERS where ORDER_NUMBER=%s",(order_number))
+    return conn, cursor
+
 @app.route('/')
 def main():
     return render_template('index.html')
@@ -41,22 +47,18 @@ def send_sms():
     cell_phone_number = request.form['cellphonenumber']
 
     try:
-        message_sent_time = ''
-        # send message only if the random number is even
-        random_number = randint(0, 100)
-        if (random_number % 2) == 0:
-            send_message(cell_phone_number, "Your order will be ready to be picked up in 15 minutes")
-            now = datetime.now()
-            message_sent_time = now.strftime('%Y-%m-%d %H:%M:%S')
-
-        conn = mysql.connect()
-        cursor = conn.cursor()
-        cursor.execute("SELECT * from ORDERS where ORDER_NUMBER=%s",(order_number))
+        conn, cursor = get_order_information(order_number)
         row_count = cursor.rowcount
-        print("row_count: ", row_count)
         if row_count > 0:
             return render_template('index.html', error='Message already sent for order number: %s' %(order_number))
         else:
+            message_sent_time = None
+            # send message only if the random number is even
+            random_number = randint(0, 100)
+            if (random_number % 2) == 0:
+                send_message(cell_phone_number, "Your order will be ready to be picked up in 15 minutes")
+                now = datetime.now()
+                message_sent_time = now.strftime('%Y-%m-%d %H:%M:%S')
             cursor.execute("INSERT INTO ORDERS (ORDER_NUMBER, CELL_PHONE_NUMBER, MESSAGE_SENT_TIME) VALUES (%s, %s, %s)", (order_number,cell_phone_number, message_sent_time))
             conn.commit()
     except Exception as e:
@@ -74,15 +76,10 @@ def confirm_pickup():
     cell_phone_number = request.form['cellphonenumber']
 
     try:
-        conn = mysql.connect()
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM ORDERS WHERE ORDER_NUMBER=%s",(order_number))
+        conn, cursor = get_order_information(order_number)
         row_count = cursor.rowcount
-        row = cursor.fetchone()
         if row_count == 0:
             return render_template('index.html', error="Order number: %s  doesn't exist, message was not sent previously" %(order_number))
-        elif row['MESSAGE_SENT_TIME'] is None:
-            pass
         else:
             now = datetime.now()
             pickup_time = now.strftime('%Y-%m-%d %H:%M:%S')
