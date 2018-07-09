@@ -17,11 +17,14 @@ app.config['MYSQL_DATABASE_DB'] = os.environ['MYSQL_DATABASE_DB']
 app.config['MYSQL_DATABASE_HOST'] = os.environ['MYSQL_DATABASE_HOST']
 mysql.init_app(app)
 
+# logging config
 logging.basicConfig(level=logging.DEBUG)
 
+# set twilio client
 proxy_client = TwilioHttpClient()
 proxy_client.session.proxies = {'https': os.environ['https_proxy']}
 
+# send message using the twilio account
 def send_message(cell_phone_number, message):
     account_sid = os.environ['TWILIO_ACCOUNT_SID']
     auth_token = os.environ['TWILIO_AUTH_TOKEN']
@@ -31,6 +34,7 @@ def send_message(cell_phone_number, message):
     	from_="+15862571827",
     	body=message)
 
+# get order information from mysql database
 def get_order_information(order_number):
     conn = mysql.connect()
     cursor = conn.cursor()
@@ -49,12 +53,14 @@ def send_sms():
     try:
         conn, cursor = get_order_information(order_number)
         row_count = cursor.rowcount
+        # insert the order information into database if there is no record for that ordernumber else redirect to home page with an error message
         if row_count > 0:
             return render_template('index.html', error='Message already sent for order number: %s' %(order_number))
         else:
+            # when the message is not sent for that record the message_sent_time will be set to null
             message_sent_time = None
-            # send message only if the random number is even
             random_number = randint(0, 100)
+            # send message only if the random number is even
             if (random_number % 2) == 0:
                 send_message(cell_phone_number, "Your order will be ready to be picked up in 15 minutes")
                 now = datetime.now()
@@ -78,8 +84,9 @@ def confirm_pickup():
     try:
         conn, cursor = get_order_information(order_number)
         row_count = cursor.rowcount
+        # update the order with pickuptime if the ordernumber already exists else redirect to home page with an error message
         if row_count == 0:
-            return render_template('index.html', error="Order number: %s  doesn't exist, message was not sent previously" %(order_number))
+            return render_template('index.html', error="Ordernumber: %s  doesn't exist, message was not sent previously" %(order_number))
         else:
             now = datetime.now()
             pickup_time = now.strftime('%Y-%m-%d %H:%M:%S')
