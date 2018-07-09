@@ -22,7 +22,7 @@
             <h7 class="mt-4">Enter Order Number and Cell Phone Number:</h7>
             <form class="mt-4" method="post">
                 <div class="mt-4 font-weight-bold">Order Number: <input type="number" name="ordernumber" id="ordernumber" class="mt-2 form-control" placeholder="Order Number" required autofocus></div>
-                <div class="mt-4 font-weight-bold">Cell Phone Number: <input type="text" name="cellphonenumber" id="cellphonenumber" class="mt-2 form-control" placeholder="Cell Phone Number" min="10" required autofocus></div>
+                <div class="mt-4 font-weight-bold">Cell Phone Number: <input type="text" name="cellphonenumber" id="cellphonenumber" class="mt-2 form-control" placeholder="Cell Phone Number" minlength="10" maxlength="10" required autofocus></div>
 
                 <button id="sendsms" formaction="{{ url_for('send_sms') }}" class="btn btn-md btn-primary btn-lg mt-4" type="submit">Send SMS</button>
                 <button id="confirmpickup" formaction="{{ url_for('confirm_pickup') }}" class="btn btn-md btn-primary btn-lg mt-4" type="submit">Confirm Pickup</button>
