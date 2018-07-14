@@ -1,9 +1,7 @@
 <html lang="en">
-
 <head>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
 </head>
-
 <body>
     <div class="container">
         <div class="header">
@@ -25,16 +23,13 @@
                 <div class="mt-4 font-weight-bold">Cell Phone Number: <input type="text" name="cellphonenumber" id="cellphonenumber" class="mt-2 form-control" placeholder="Cell Phone Number" minlength="10" maxlength="10" required autofocus></div>
 
                 <button id="sendsms" formaction="{{ url_for('send_sms') }}" class="btn btn-md btn-primary btn-lg mt-4" type="submit">Send SMS</button>
-                <button id="confirmpickup" formaction="{{ url_for('confirm_pickup') }}" class="btn btn-md btn-primary btn-lg mt-4" type="submit">Confirm Pickup</button>
+                <button id="confirmpickup" onclick="getElementById('cellphonenumber').required = false" formaction="{{ url_for('confirm_pickup') }}" class="btn btn-md btn-primary btn-lg mt-4" type="submit">Confirm Pickup</button>
             </form>
         </div>
 
         <footer class="footer">
             <p>&copy; Waittime 2018</p>
         </footer>
-
     </div>
-
 </body>
-
 </html>
