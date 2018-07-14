@@ -9,7 +9,7 @@ from random import randint
 
 mysql = MySQL()
 app = Flask(__name__)
-app.config["DEBUG"] = True
+app.config['DEBUG'] = True
 # MySQL configurations
 app.config['MYSQL_DATABASE_USER'] =  os.environ['MYSQL_DATABASE_USER']
 app.config['MYSQL_DATABASE_PASSWORD'] = os.environ['MYSQL_DATABASE_PASSWORD']
@@ -31,14 +31,14 @@ def send_message(cell_phone_number, message):
     client = Client(account_sid, auth_token, http_client=proxy_client)
     call = client.messages.create(
     	to=cell_phone_number,
-    	from_="+15862571827",
+    	from_='+15862571827',
     	body=message)
 
 # get order information from mysql database
 def get_order_information(order_number):
     conn = mysql.connect()
     cursor = conn.cursor()
-    cursor.execute("SELECT * from ORDERS where ORDER_NUMBER=%s",(order_number))
+    cursor.execute('SELECT * from ORDERS where ORDER_NUMBER=%s',(order_number))
     return conn, cursor
 
 @app.route('/')
@@ -62,10 +62,10 @@ def send_sms():
             random_number = randint(0, 100)
             # send message only if the random number is even
             if (random_number % 2) == 0:
-                send_message(cell_phone_number, "Your order will be ready to be picked up in 15 minutes")
+                send_message(cell_phone_number, 'Thank you for ordering from Haldi!  Your order will be ready to be picked up in 15 minutes.')
                 now = datetime.now()
                 message_sent_time = now.strftime('%Y-%m-%d %H:%M:%S')
-            cursor.execute("INSERT INTO ORDERS (ORDER_NUMBER, CELL_PHONE_NUMBER, MESSAGE_SENT_TIME) VALUES (%s, %s, %s)", (order_number,cell_phone_number, message_sent_time))
+            cursor.execute('INSERT INTO ORDERS (ORDER_NUMBER, CELL_PHONE_NUMBER, MESSAGE_SENT_TIME) VALUES (%s, %s, %s)', (order_number,cell_phone_number, message_sent_time))
             conn.commit()
     except Exception as e:
         logging.error(e)
@@ -79,21 +79,22 @@ def send_sms():
 @app.route('/confirmpickup', methods=['POST'])
 def confirm_pickup():
     order_number = request.form['ordernumber']
-    cell_phone_number = request.form['cellphonenumber']
 
     try:
         conn, cursor = get_order_information(order_number)
         row_count = cursor.rowcount
+        row = cursor.fetchone()
         # update the order with pickuptime if the ordernumber already exists else redirect to home page with an error message
         if row_count == 0:
             return render_template('index.html', error="Ordernumber: %s  doesn't exist, message was not sent previously" %(order_number))
         else:
             now = datetime.now()
             pickup_time = now.strftime('%Y-%m-%d %H:%M:%S')
-            cursor.execute("UPDATE ORDERS SET PICKUP_TIME = %s WHERE ORDER_NUMBER= %s", (pickup_time,order_number))
+            cursor.execute('UPDATE ORDERS SET PICKUP_TIME = %s WHERE ORDER_NUMBER= %s', (pickup_time,order_number))
             conn.commit()
         # once pickedup send survey question
-        send_message(cell_phone_number, "How satisfied are you with the promptness of your order?\n0-worst, 10-exceptional")
+        cell_phone_number = row[2]
+        send_message(cell_phone_number, 'We hope you enjoyed your meal from Haldi! Please help us improve our service by rating your take-out order experience on a scale of 1-5, with 5 being the most positive.')
     except Exception as e:
         logging.error(e)
         return render_template('index.html', error=str(e))
