@@ -38,7 +38,7 @@ def send_message(cell_phone_number, message):
 def get_order_information(order_number):
     conn = mysql.connect()
     cursor = conn.cursor()
-    cursor.execute('SELECT * from ORDERS where ORDER_NUMBER=%s',(order_number))
+    cursor.execute('SELECT * FROM ORDERS WHERE ORDER_NUMBER=%s',(order_number))
     return conn, cursor
 
 @app.route('/')
@@ -87,6 +87,9 @@ def confirm_pickup():
         # update the order with pickuptime if the ordernumber already exists else redirect to home page with an error message
         if row_count == 0:
             return render_template('index.html', error="Ordernumber: %s  doesn't exist, message was not sent previously" %(order_number))
+        # if the pickup time is already updated don't update again.
+        elif row[4] is not None:
+            return render_template('index.html', error="Already confirmed pickup for ordernumber: %s" %(order_number))
         else:
             now = datetime.now()
             pickup_time = now.strftime('%Y-%m-%d %H:%M:%S')
@@ -102,6 +105,6 @@ def confirm_pickup():
         cursor.close()
         conn.close()
 
-    return render_template('index.html', message='Updated pick up')
+    return render_template('index.html', message='Pickup confirmed')
 
 
