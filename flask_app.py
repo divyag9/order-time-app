@@ -11,10 +11,10 @@ mysql = MySQL()
 app = Flask(__name__)
 app.config['DEBUG'] = True
 # MySQL configurations
-app.config['MYSQL_DATABASE_USER'] =  'divyagorantla' #os.environ['MYSQL_DATABASE_USER']
-app.config['MYSQL_DATABASE_PASSWORD'] = 'divemmhea' #os.environ['MYSQL_DATABASE_PASSWORD'] #
-app.config['MYSQL_DATABASE_DB'] = 'divyagorantla$waittimes' #os.environ['MYSQL_DATABASE_DB'] #
-app.config['MYSQL_DATABASE_HOST'] = 'divyagorantla.mysql.pythonanywhere-services.com' #os.environ['MYSQL_DATABASE_HOST'] #
+app.config['MYSQL_DATABASE_USER'] =  os.environ['MYSQL_DATABASE_USER']
+app.config['MYSQL_DATABASE_PASSWORD'] = ['MYSQL_DATABASE_PASSWORD']
+app.config['MYSQL_DATABASE_DB'] = os.environ['MYSQL_DATABASE_DB']
+app.config['MYSQL_DATABASE_HOST'] = os.environ['MYSQL_DATABASE_HOST']
 mysql.init_app(app)
 
 # logging config
@@ -22,7 +22,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 # set twilio client
 proxy_client = TwilioHttpClient()
-proxy_client.session.proxies = {'https': 'http://proxy.server:3128'}
+proxy_client.session.proxies = {'https': os.environ['http_proxy']}
 
 # send message using the twilio account
 def send_message(cell_phone_number, message):
