@@ -141,13 +141,15 @@ def confirm_pickup():
     try:
         conn, cursor = get_order_information(order_number)
         row = cursor.fetchone()
+
+        # once pickedup send survey question
+        cell_phone_number = row[2]
+        send_message(cell_phone_number, 'We hope you enjoyed your meal from Haldi! Please help us improve our service by rating your take-out order experience on a scale of 1-5, with 5 being the most positive.')
+
         now = datetime.now()
         pickup_time = now.strftime('%Y-%m-%d %H:%M:%S')
         cursor.execute('UPDATE ORDERS SET PICKUP_TIME = %s WHERE ORDER_NUMBER= %s', (pickup_time,order_number))
         conn.commit()
-        # once pickedup send survey question
-        cell_phone_number = row[2]
-        send_message(cell_phone_number, 'We hope you enjoyed your meal from Haldi! Please help us improve our service by rating your take-out order experience on a scale of 1-5, with 5 being the most positive.')
         #send back incomplete orders
         orders = get_orders(conn, cursor)
 
