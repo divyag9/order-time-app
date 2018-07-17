@@ -1,0 +1,35 @@
+<html lang="en">
+<head>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h3 class="text-muted mt-4">Order Time Messager</h3>
+        </div>
+
+        <div class="jumbotron mt-4">
+            {% if message %}
+            <h5 class="text-success">{{ message }}</h5>
+            {% endif %}
+
+            {% if error %}
+            <h5 class="text-danger">{{ error }}</h5>
+            {% endif %}
+
+            <h7 class="mt-4">Enter Order Number and Cell Phone Number:</h7>
+            <form class="mt-4" method="post">
+                <div class="mt-4 font-weight-bold">Order Number: <input type="number" name="ordernumber" id="ordernumber" class="mt-2 form-control" placeholder="Order Number" required autofocus></div>
+                <div class="mt-4 font-weight-bold">Cell Phone Number: <input type="text" name="cellphonenumber" id="cellphonenumber" class="mt-2 form-control" placeholder="Cell Phone Number" minlength="10" maxlength="10" required autofocus></div>
+
+                <button id="sendsms" formaction="{{ url_for('send_sms') }}" class="btn btn-md btn-primary btn-lg mt-4" type="submit">Send SMS</button>
+                <button id="confirmpickup" onclick="getElementById('cellphonenumber').required = false" formaction="{{ url_for('confirm_pickup') }}" class="btn btn-md btn-primary btn-lg mt-4" type="submit">Confirm Pickup</button>
+            </form>
+        </div>
+
+        <footer class="footer">
+            <p>&copy; Waittime 2018</p>
+        </footer>
+    </div>
+</body>
+</html>
