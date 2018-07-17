@@ -60,7 +60,11 @@
                             <td>
                                 <form action="{{ url_for('confirm_pickup') }}" method="post">
                                     <input type="hidden" name = "pickup_ordernumber" value={{ order[1] }}>
-                                    <input id="confirmpickup" class="btn btn-md btn-primary mt-4" type="submit" value = "Confirm pickup">
+                                    {% if sendsms_ordernumber == order[1] | string() %}
+                                        <input id="confirmpickup" class="btn btn-md btn-primary mt-4" type="submit" value = "Confirm pickup">
+                                    {% else %}
+                                        <input id="confirmpickup" class="btn btn-md btn-primary mt-4" type="submit" value = "Confirm pickup" disabled>
+                                    {% endif %}
                                 </form>
                             </td>
                         </tr>
